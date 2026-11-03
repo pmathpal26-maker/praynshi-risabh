@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROPHUNT2 | Cinematic Collectibles Vault</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="grain"></div>
+
+  <div class="app-shell">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+      <div class="logo"><a href="#home">PROP<span>HUNT</span></a></div>
+
+      <!-- same classes / ids / hrefs as before so script.js keeps working -->
+      <nav class="nav-links main-links">
+        <a href="#home" class="nav-home">Home</a>
+        <a href="#catalog" class="nav-catalog">Catalog</a>
+        <a href="#myvault" class="nav-vault">🛡️ My Vault</a>
+        <a href="#sell" class="nav-sell">Sell a Prop</a>
+        <a href="#account" id="auth-nav-link" class="nav-account">Account</a>
+      </nav>
+
+      <div class="side-section">
+        <p class="side-title">Browse by genre</p>
+        <a href="#catalog" class="side-chip" data-filter="Sci-Fi"><i style="--c:#22d3ee"></i>Sci-Fi</a>
+        <a href="#catalog" class="side-chip" data-filter="Fantasy"><i style="--c:#a855f7"></i>Fantasy</a>
+        <a href="#catalog" class="side-chip" data-filter="Action"><i style="--c:#ff3d77"></i>Action</a>
+        <a href="#catalog" class="side-chip" data-filter="all"><i style="--c:#ffe066"></i>All props</a>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN COLUMN ============ -->
+    <div class="main-col">
+
+      <!-- Live Ticker Banner -->
+      <div class="live-ticker">
+        <span id="ticker-text">🔴 LIVE VAULT: New cinematic items listing every hour. Place your bids now!</span>
+      </div>
+
+      <header class="header">
+        <div class="topbar">
+          <div class="top-left">
+            <button class="round-btn" id="nav-back" aria-label="Back">‹</button>
+            <button class="round-btn" id="nav-forward" aria-label="Forward">›</button>
+            <label class="search-pill">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              <input type="search" id="global-search" placeholder="Search props, movies, genres…" autocomplete="off">
+            </label>
+          </div>
+          <a href="#sell" class="cta-btn btn btn-gold top-cta">+ List a prop</a>
+        </div>
+      </header>
+
+      <!-- Winner Notification Banner -->
+      <div id="winner-banner" style="display: none; padding: 2rem; text-align: center;">
+    <h1 class="neon-gradient-text" style="margin-bottom: 0.5rem;">CONGRATULATIONS!</h1>
+    <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">You won the auction for <span id="won-item-name" style="color: var(--accent-gold, #ffe066); font-weight: bold;"></span>!</p>
+    <button id="buy-now-btn" class="cta-btn btn btn-gold">Proceed to Checkout</button>
+</div>
+
+      <main id="app">
+
+        <!-- Home -->
+        <section id="home" class="view active hero">
+          <div class="hero-glow g1"></div>
+          <div class="hero-glow g2"></div>
+
+          <div class="spotlight">
+            <div class="spotlight-text">
+              <div class="win-overlay" id="win-overlay">
+  <button class="win-close" id="win-close" aria-label="Dismiss">&times;</button>
+  <h2 class="win-title serif">CONGRATULATIONS!</h2>
+  <p class="win-sub">YOU WON!</p>
+  <p class="win-line">The auction for <em id="win-name"></em> <span id="win-price"></span></p>
+  <button class="cta-btn btn btn-gold" id="win-checkout">Proceed to Checkout</button>
+</div>
+              <span class="spot-tag">Spotlight · Cinematic Vault</span>
+              <h1 class="serif hero-title">CINEMATIC<br>VAULT</h1>
+              <p class="lede hero-subtitle">Rare props, film replicas, and screen-used memorabilia.</p>
+              <div class="hero-ctas">
+                <a href="#catalog" class="cta-btn btn btn-gold">Explore Marketplace</a>
+              </div>
+            </div>
+            <svg class="spot-art" viewBox="0 0 200 220" aria-hidden="true">
+              <defs>
+                <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset="1" stop-color="#b98a2e"/></linearGradient>
+                <linearGradient id="base" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a855f7"/><stop offset="1" stop-color="#4b2fbf"/></linearGradient>
+              </defs>
+              <ellipse cx="100" cy="196" rx="86" ry="20" fill="url(#base)"/>
+              <rect x="14" y="170" width="172" height="26" fill="url(#base)"/>
+              <ellipse cx="100" cy="170" rx="86" ry="18" fill="#c084fc"/>
+              <path d="M62 30h76v50c0 28-16 46-38 50-22-4-38-22-38-50z" fill="url(#gold)"/>
+              <path d="M62 40c-26 0-32 10-26 26s24 30 36 30M138 40c26 0 32 10 26 26s-24 30-36 30" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
+              <rect x="92" y="130" width="16" height="26" fill="url(#gold)"/>
+              <rect x="70" y="152" width="60" height="16" rx="4" fill="url(#gold)"/>
+            </svg>
+          </div>
+
+          
+         <h2 class="section-title serif">Browse by genre</h2>
+<div class="tile-row">
+  <!-- Sci-Fi Tile -->
+  <a href="#catalog" class="tile t-scifi" data-filter="Sci-Fi" style="background: linear-gradient(145deg, #0e7490, #1e1b4b); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
+    <img src="assets/scifi-logo.png" alt="Sci-Fi" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
+    <span style="position: relative; z-index: 1;">Sci-Fi</span>
+    <small style="position: relative; z-index: 1;">Starships, masks &amp; gadgets</small>
+  </a>
+
+  <!-- Fantasy Tile -->
+  <a href="#catalog" class="tile t-fantasy" data-filter="Fantasy" style="background: linear-gradient(145deg, #9333ea, #3b0764); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
+    <img src="assets/fantasy-logo.png" alt="Fantasy" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
+    <span style="position: relative; z-index: 1;">Fantasy</span>
+    <small style="position: relative; z-index: 1;">Swords, relics &amp; chalices</small>
+  </a>
+
+  <!-- Action Tile -->
+  <a href="#catalog" class="tile t-action" data-filter="Action" style="background: linear-gradient(145deg, #e11d48, #4c0519); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
+    <img src="assets/action-logo.png" alt="Action" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
+    <span style="position: relative; z-index: 1;">Action</span>
+    <small style="position: relative; z-index: 1;">Hero gear &amp; weapons</small>
+  </a>
+
+  <!-- Everything Tile -->
+  <a href="#catalog" class="tile t-all" data-filter="all" style="background: linear-gradient(145deg, #4f46e5, #172554); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
+    <img src="assets/all-logo.png" alt="Everything" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
+    <span style="position: relative; z-index: 1;">Everything</span>
+    <small style="position: relative; z-index: 1;">The full vault</small>
+  </a>
+</div>
+
+          <div class="stats">
+            <div><h3 class="serif" style="color: var(--accent-cyan);">100%</h3><p>Screen-Authenticated Provenance</p></div>
+            <div><h3 class="serif" style="color: var(--accent-magenta);">24/7</h3><p>Encrypted Vault Surveillance</p></div>
+            <div><h3 class="serif">SECURE</h3><p>Automated Smart-Escrow</p></div>
+          </div>
+        </section>
+
+        <!-- Catalog View -->
+        <section id="catalog" class="view container">
+          <div class="catalog-head">
+            <h2 class="serif">Live Vault Auctions</h2>
+            <div class="filter-bar">
+              <select id="franchise-filter" class="type-select">
+                <option value="all">All Franchises / Categories</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Action">Action</option>
+              </select>
+            </div>
+          </div>
+          <div id="auction-grid" class="grid listing-grid"></div>
+          <section class="recommendations-section">
+            <h3 class="section-title">Recommended For You</h3>
+            <div id="recommendations-grid" class="grid listing-grid"></div>
+          </section>
+        </section>
+
+        <!-- My Vault View -->
+        <section id="myvault" class="view container">
+          <div class="catalog-head">
+            <h2 class="serif">My Vault Collection</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Props and artifacts you have won or securely purchased.</p>
+          </div>
+          <div id="myvault-grid" class="grid listing-grid" style="margin-top: 1.5rem;"></div>
+        </section>
+
+        <!-- Sell View -->
+        <section id="sell" class="view container">
+          <div class="form-container">
+            <h2 class="serif" style="margin-bottom: 1rem;">List an Item</h2>
+            <form id="create-auction-form">
+              <div class="form-field">
+                <input type="text" id="prop-title" placeholder="Item Title" required>
+              </div>
+              <div class="form-field">
+                <select id="prop-category" class="type-select" required>
+                  <option value="" disabled selected>Select Category</option>
+                  <option value="Sci-Fi">Sci-Fi</option>
+                  <option value="Fantasy">Fantasy</option>
+                  <option value="Action">Action</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <input type="number" id="prop-price" placeholder="Starting Price ($)" required>
+              </div>
+              <div class="form-field">
+                <label class="field-label">Upload Prop Image</label>
+                <input type="file" id="prop-image-file" accept="image/*" required>
+              </div>
+              <div class="form-field">
+                <label class="field-label">Auction Start Time</label>
+                <input type="datetime-local" id="prop-start-time" required>
+              </div>
+              <div class="form-field">
+                <label class="field-label">Auction End Time</label>
+                <input type="datetime-local" id="prop-end-time" required>
+              </div>
+              <button type="submit" class="cta-btn btn btn-gold" style="width: 100%;">Publish Auction</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Account View -->
+        <section id="account" class="view container">
+          <div class="form-container" id="auth-container">
+            <h2 id="auth-heading" class="serif" style="margin-bottom: 1rem;">Sign In</h2>
+            <form id="login-form">
+              <div class="form-field">
+                <input type="email" id="auth-email" placeholder="Email" required>
+              </div>
+              <div class="form-field">
+                <input type="password" id="auth-password" placeholder="Password" required>
+              </div>
+              <button type="submit" class="cta-btn btn btn-gold" id="auth-submit-btn" style="width: 100%;">Login</button>
+            </form>
+            <p class="auth-toggle" id="toggle-auth-mode">Don't have an account? Register</p>
+          </div>
+        </section>
+
+        <!-- Checkout View -->
+        <section id="checkout" class="view container">
+          <div class="form-container">
+            <h2 class="serif" style="margin-bottom: 1rem;">Demo Checkout</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">You are completing purchase for: <strong id="checkout-item-title" style="color: var(--accent-cyan);"></strong></p>
+            <p style="font-size: 1.2rem; font-weight: bold; color: var(--accent-magenta); margin-bottom: 1.5rem;">Total: $<span id="checkout-item-price"></span></p>
+            <form id="checkout-form">
+              <div class="form-field"><input type="text" placeholder="Shipping Address" required></div>
+              <div class="form-field"><input type="text" placeholder="Card Number (Demo Only)" required></div>
+              <button type="submit" class="cta-btn btn btn-gold" style="width: 100%;">Confirm Purchase</button>
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Product Detail Modal Popup -->
+  <div id="product-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" id="close-modal">&times;</button>
+      <img id="modal-item-img" class="modal-img" src="" alt="Prop Image">
+      <h2 id="modal-item-title" class="serif"></h2>
+      <p id="modal-item-category" class="modal-meta"></p>
+      <p id="modal-item-seller" class="modal-meta"></p>
+      <div class="modal-desc">
+        <p id="modal-item-desc">Screen-authenticated cinematic prop collectible with certified studio provenance. Maintained in secure archival vault storage.</p>
+      </div>
+      <div class="modal-foot">
+        <span class="modal-price">$<span id="modal-item-price"></span></span>
+        <button id="modal-bid-btn" class="cta-btn btn btn-gold">Place Bid (+$10)</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+  <!-- visual-only helpers (search filter, genre shortcuts, active menu) -->
+  <script src="ui.js"></script>
+</body>
+</html>

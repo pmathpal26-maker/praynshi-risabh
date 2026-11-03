@@ -1,0 +1,64 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /auctions/{auctionId} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll([
+          'title',
+          'category',
+          'currentBid',
+          'highestBidderId',
+          'highestBidderEmail',
+          'imageUrl',
+          'sellerId',
+          'sellerEmail',
+          'startTime',
+          'endTime',
+          'createdAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'title',
+          'category',
+          'currentBid',
+          'highestBidderId',
+          'highestBidderEmail',
+          'imageUrl',
+          'sellerId',
+          'sellerEmail',
+          'startTime',
+          'endTime',
+          'createdAt'
+        ])
+        && request.resource.data.sellerId == request.auth.uid
+        && request.resource.data.highestBidderId == ''
+        && request.resource.data.sellerEmail == request.auth.token.email
+        && request.resource.data.highestBidderEmail == ''
+        && request.resource.data.title is string
+        && request.resource.data.category in ['Sci-Fi', 'Fantasy', 'Action']
+        && request.resource.data.currentBid is number
+        && request.resource.data.currentBid > 0
+        && request.resource.data.imageUrl is string
+        && request.resource.data.sellerEmail is string
+        && request.resource.data.highestBidderEmail is string
+        && request.resource.data.startTime is number
+        && request.resource.data.endTime is number
+        && request.resource.data.endTime > request.resource.data.startTime
+        && request.resource.data.createdAt is number;
+
+      allow update: if request.auth != null
+        && request.auth.uid != resource.data.sellerId
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['currentBid', 'highestBidderId', 'highestBidderEmail'])
+        && request.resource.data.currentBid is number
+        && request.resource.data.currentBid > resource.data.currentBid
+        && request.resource.data.highestBidderId == request.auth.uid
+        && request.resource.data.highestBidderEmail == request.auth.token.email;
+
+      allow delete: if request.auth != null
+        && request.auth.uid == resource.data.sellerId;
+    }
+  }
+}
