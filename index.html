@@ -16,7 +16,6 @@
     <aside class="sidebar">
       <div class="logo"><a href="#home">PROP<span>HUNT</span></a></div>
 
-      <!-- same classes / ids / hrefs as before so script.js keeps working -->
       <nav class="nav-links main-links">
         <a href="#home" class="nav-home">Home</a>
         <a href="#catalog" class="nav-catalog">Catalog</a>
@@ -52,16 +51,35 @@
               <input type="search" id="global-search" placeholder="Search props, movies, genres…" autocomplete="off">
             </label>
           </div>
-          <a href="#sell" class="cta-btn btn btn-gold top-cta">+ List a prop</a>
+          
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <!-- Auth Navigation Container (Login / Logout UI) -->
+            <div class="auth-container">
+              <!-- Show when user is LOGGED OUT -->
+              <div id="logged-out-ui" class="auth-box">
+                <a href="#account" id="btn-open-login" class="cta-btn btn" style="border: 1px solid rgba(255,255,255,0.2); background: transparent;">Log In</a>
+              </div>
+
+              <!-- Show when user is LOGGED IN -->
+              <div id="logged-in-ui" class="auth-box" style="display: none; align-items: center; gap: 0.75rem;">
+                <div class="user-profile-badge" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                  <span id="user-display-email" class="user-email-text" style="font-size: 0.85rem; color: #e2e8f0;">user@gmail.com</span>
+                </div>
+                <button id="btn-logout" class="cta-btn btn" style="background: transparent; color: #ff3d77; border: 1px solid #ff3d77; padding: 6px 14px; font-size: 0.85rem;">Log Out</button>
+              </div>
+            </div>
+
+            <a href="#sell" class="cta-btn btn btn-gold top-cta">+ List a prop</a>
+          </div>
         </div>
       </header>
 
       <!-- Winner Notification Banner -->
       <div id="winner-banner" style="display: none; padding: 2rem; text-align: center;">
-    <h1 class="neon-gradient-text" style="margin-bottom: 0.5rem;">CONGRATULATIONS!</h1>
-    <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">You won the auction for <span id="won-item-name" style="color: var(--accent-gold, #ffe066); font-weight: bold;"></span>!</p>
-    <button id="buy-now-btn" class="cta-btn btn btn-gold">Proceed to Checkout</button>
-</div>
+        <h1 class="neon-gradient-text" style="margin-bottom: 0.5rem;">CONGRATULATIONS!</h1>
+        <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">You won the auction for <span id="won-item-name" style="color: var(--accent-gold, #ffe066); font-weight: bold;"></span>!</p>
+        <button id="buy-now-btn" class="cta-btn btn btn-gold">Proceed to Checkout</button>
+      </div>
 
       <main id="app">
 
@@ -73,12 +91,12 @@
           <div class="spotlight">
             <div class="spotlight-text">
               <div class="win-overlay" id="win-overlay">
-  <button class="win-close" id="win-close" aria-label="Dismiss">&times;</button>
-  <h2 class="win-title serif">CONGRATULATIONS!</h2>
-  <p class="win-sub">YOU WON!</p>
-  <p class="win-line">The auction for <em id="win-name"></em> <span id="win-price"></span></p>
-  <button class="cta-btn btn btn-gold" id="win-checkout">Proceed to Checkout</button>
-</div>
+                <button class="win-close" id="win-close" aria-label="Dismiss">&times;</button>
+                <h2 class="win-title serif">CONGRATULATIONS!</h2>
+                <p class="win-sub">YOU WON!</p>
+                <p class="win-line">The auction for <em id="win-name"></em> <span id="win-price"></span></p>
+                <button class="cta-btn btn btn-gold" id="win-checkout">Proceed to Checkout</button>
+              </div>
               <span class="spot-tag">Spotlight · Cinematic Vault</span>
               <h1 class="serif hero-title">CINEMATIC<br>VAULT</h1>
               <p class="lede hero-subtitle">Rare props, film replicas, and screen-used memorabilia.</p>
@@ -101,37 +119,32 @@
             </svg>
           </div>
 
-          
-         <h2 class="section-title serif">Browse by genre</h2>
-<div class="tile-row">
-  <!-- Sci-Fi Tile -->
-  <a href="#catalog" class="tile t-scifi" data-filter="Sci-Fi" style="background: linear-gradient(145deg, #0e7490, #1e1b4b); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
-    <img src="assets/scifi-logo.png" alt="Sci-Fi" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
-    <span style="position: relative; z-index: 1;">Sci-Fi</span>
-    <small style="position: relative; z-index: 1;">Starships, masks &amp; gadgets</small>
-  </a>
+          <h2 class="section-title serif">Browse by genre</h2>
+          <div class="tile-row">
+            <a href="#catalog" class="tile t-scifi" data-filter="Sci-Fi" style="background: linear-gradient(145deg, #0e7490, #1e1b4b); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
+              <img src="assets/scifi-logo.png" alt="Sci-Fi" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
+              <span style="position: relative; z-index: 1;">Sci-Fi</span>
+              <small style="position: relative; z-index: 1;">Starships, masks &amp; gadgets</small>
+            </a>
 
-  <!-- Fantasy Tile -->
-  <a href="#catalog" class="tile t-fantasy" data-filter="Fantasy" style="background: linear-gradient(145deg, #9333ea, #3b0764); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
-    <img src="assets/fantasy-logo.png" alt="Fantasy" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
-    <span style="position: relative; z-index: 1;">Fantasy</span>
-    <small style="position: relative; z-index: 1;">Swords, relics &amp; chalices</small>
-  </a>
+            <a href="#catalog" class="tile t-fantasy" data-filter="Fantasy" style="background: linear-gradient(145deg, #9333ea, #3b0764); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
+              <img src="assets/fantasy-logo.png" alt="Fantasy" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
+              <span style="position: relative; z-index: 1;">Fantasy</span>
+              <small style="position: relative; z-index: 1;">Swords, relics &amp; chalices</small>
+            </a>
 
-  <!-- Action Tile -->
-  <a href="#catalog" class="tile t-action" data-filter="Action" style="background: linear-gradient(145deg, #e11d48, #4c0519); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
-    <img src="assets/action-logo.png" alt="Action" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
-    <span style="position: relative; z-index: 1;">Action</span>
-    <small style="position: relative; z-index: 1;">Hero gear &amp; weapons</small>
-  </a>
+            <a href="#catalog" class="tile t-action" data-filter="Action" style="background: linear-gradient(145deg, #e11d48, #4c0519); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
+              <img src="assets/action-logo.png" alt="Action" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
+              <span style="position: relative; z-index: 1;">Action</span>
+              <small style="position: relative; z-index: 1;">Hero gear &amp; weapons</small>
+            </a>
 
-  <!-- Everything Tile -->
-  <a href="#catalog" class="tile t-all" data-filter="all" style="background: linear-gradient(145deg, #4f46e5, #172554); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
-    <img src="assets/all-logo.png" alt="Everything" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
-    <span style="position: relative; z-index: 1;">Everything</span>
-    <small style="position: relative; z-index: 1;">The full vault</small>
-  </a>
-</div>
+            <a href="#catalog" class="tile t-all" data-filter="all" style="background: linear-gradient(145deg, #4f46e5, #172554); position: relative; overflow: hidden; padding: 1.5rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 140px;">
+              <img src="assets/all-logo.png" alt="Everything" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; pointer-events: none;">
+              <span style="position: relative; z-index: 1;">Everything</span>
+              <small style="position: relative; z-index: 1;">The full vault</small>
+            </a>
+          </div>
 
           <div class="stats">
             <div><h3 class="serif" style="color: var(--accent-cyan);">100%</h3><p>Screen-Authenticated Provenance</p></div>
@@ -222,6 +235,19 @@
           </div>
         </section>
 
+        <!-- Verification Waiting Screen -->
+        <section id="verify-wait" class="view container">
+          <div class="form-container" style="text-align: center;">
+            <h2 class="serif" style="margin-bottom: 1rem; color: var(--accent-gold, #ffe066);">📧 Verification Required</h2>
+            <p style="color: var(--text-muted, #8a8a9e); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">
+              A verification link has been sent to your Gmail inbox. Please check your phone or email, click the link, and this screen will automatically refresh into the dashboard.
+            </p>
+            <div style="font-size: 2rem; margin-bottom: 1.5rem;">⏳</div>
+            <button id="btn-resend-verification" class="cta-btn btn btn-gold" style="width: 100%; margin-bottom: 0.75rem;">Resend Email</button>
+            <button id="btn-cancel-verify" class="cta-btn btn" style="width: 100%; background: transparent; color: #ff3d77; border: 1px solid #ff3d77;">Cancel / Back to Sign In</button>
+          </div>
+        </section>
+
         <!-- Checkout View -->
         <section id="checkout" class="view container">
           <div class="form-container">
@@ -259,7 +285,6 @@
   </div>
 
   <script type="module" src="script.js"></script>
-  <!-- visual-only helpers (search filter, genre shortcuts, active menu) -->
   <script src="ui.js"></script>
 </body>
 </html>

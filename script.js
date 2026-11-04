@@ -3,7 +3,8 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  sendEmailVerification 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { 
   collection, 
@@ -13,7 +14,6 @@ import {
   doc, 
   updateDoc, 
   deleteDoc,
-  serverTimestamp, 
   query, 
   orderBy 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -22,10 +22,18 @@ let checkoutItem = { title: "", price: 0 };
 let stopWatchingWinner = null;
 let winnerEndTimer = null;
 let winnerWatchGeneration = 0;
+let verificationInterval = null;
 
 // --- Routing ---
 function handleRoute() {
   const hash = window.location.hash.replace("#", "") || "home";
+
+  // Lock unverified user on the verification waiting view
+  if (auth.currentUser && !auth.currentUser.emailVerified && hash !== "verify-wait") {
+    window.location.hash = "verify-wait";
+    return;
+  }
+
   const views = document.querySelectorAll(".view");
   views.forEach((view) => {
     if (view.id === hash) {
@@ -39,6 +47,8 @@ function handleRoute() {
     loadAuctions();
   } else if (hash === "myvault") {
     loadMyVault();
+  } else if (hash === "verify-wait") {
+    setupVerificationScreen();
   }
 }
 
@@ -61,53 +71,150 @@ function setupAuthUI() {
   const toggleAuthMode = document.getElementById("toggle-auth-mode");
   const authNavLink = document.getElementById("auth-nav-link");
 
-  toggleAuthMode.addEventListener("click", () => {
-    isRegisterMode = !isRegisterMode;
-    authHeading.textContent = isRegisterMode ? "Create Account" : "Sign In";
-    authSubmitBtn.textContent = isRegisterMode ? "Register" : "Login";
-    toggleAuthMode.textContent = isRegisterMode
-      ? "Already have an account? Sign In"
-      : "Don't have an account? Register";
-  });
+  if (toggleAuthMode && authForm) {
+    toggleAuthMode.addEventListener("click", () => {
+      isRegisterMode = !isRegisterMode;
+      authHeading.textContent = isRegisterMode ? "Create Account" : "Sign In";
+      authSubmitBtn.textContent = isRegisterMode ? "Register" : "Login";
+      toggleAuthMode.textContent = isRegisterMode
+        ? "Already have an account? Sign In"
+        : "Don't have an account? Register";
+    });
 
-  authForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("auth-email").value;
-    const password = document.getElementById("auth-password").value;
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("auth-email").value;
+      const password = document.getElementById("auth-password").value;
 
-    try {
-      if (isRegisterMode) {
-        await createUserWithEmailAndPassword(auth, email, password);
-        alert("Account created successfully!");
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Logged in successfully!");
+      try {
+        if (isRegisterMode) {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          await sendEmailVerification(user);
+          
+          alert("Account created successfully! Verification email sent.");
+          watchEmailVerification(user);
+        } else {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          if (!user.emailVerified) {
+            alert("Please verify your Gmail address via the link sent to your inbox before logging in.");
+            watchEmailVerification(user);
+            return;
+          }
+
+          alert("Logged in successfully!");
+          window.location.hash = "catalog";
+        }
+      } catch (error) {
+        alert("Auth Error: " + error.message);
       }
-      window.location.hash = "catalog";
-    } catch (error) {
-      alert("Auth Error: " + error.message);
-    }
-  });
+    });
+  }
 
   onAuthStateChanged(auth, (user) => {
+    const loggedOutUI = document.getElementById('logged-out-ui');
+    const loggedInUI = document.getElementById('logged-in-ui');
+    const userEmailText = document.getElementById('user-display-email');
+
     if (user) {
-      authNavLink.textContent = "Sign Out (" + user.email.split("@")[0] + ")";
-      authNavLink.onclick = (e) => {
-        e.preventDefault();
-        signOut(auth);
-      };
+      if (!user.emailVerified) {
+        watchEmailVerification(user);
+      } else {
+        if (verificationInterval) clearInterval(verificationInterval);
+      }
+
+      if (loggedOutUI) loggedOutUI.style.display = 'none';
+      if (loggedInUI) loggedInUI.style.display = 'flex';
+      if (userEmailText) userEmailText.textContent = user.email || 'User';
+
+      if (authNavLink) {
+        authNavLink.textContent = "Sign Out (" + user.email.split("@")[0] + ")";
+        authNavLink.onclick = (e) => {
+          e.preventDefault();
+          if (verificationInterval) clearInterval(verificationInterval);
+          signOut(auth);
+        };
+      }
     } else {
-      authNavLink.textContent = "Account";
-      authNavLink.onclick = null;
-      authNavLink.setAttribute("href", "#account");
+      if (verificationInterval) clearInterval(verificationInterval);
+      if (loggedOutUI) loggedOutUI.style.display = 'block';
+      if (loggedInUI) loggedInUI.style.display = 'none';
+
+      if (authNavLink) {
+        authNavLink.textContent = "Account";
+        authNavLink.onclick = null;
+        authNavLink.setAttribute("href", "#account");
+      }
     }
     checkWinnerStatus(user);
   });
+
+  const logoutBtn = document.getElementById('btn-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        if (verificationInterval) clearInterval(verificationInterval);
+        await signOut(auth);
+        alert("Logged out successfully!");
+        window.location.hash = "#home";
+      } catch (error) {
+        console.error("Logout Error:", error);
+      }
+    });
+  }
 }
 
-// --- Create Auction ---
+// --- Verification Screen Controls & Polling Watcher ---
+function setupVerificationScreen() {
+  const resendBtn = document.getElementById("btn-resend-verification");
+  const cancelBtn = document.getElementById("btn-cancel-verify");
+
+  if (resendBtn && auth.currentUser) {
+    resendBtn.onclick = async () => {
+      try {
+        await sendEmailVerification(auth.currentUser);
+        alert("Verification email resent! Please check your Gmail.");
+      } catch (err) {
+        alert("Error resending email: " + err.message);
+      }
+    };
+  }
+
+  if (cancelBtn) {
+    cancelBtn.onclick = async () => {
+      if (verificationInterval) clearInterval(verificationInterval);
+      await signOut(auth);
+      window.location.hash = "account";
+    };
+  }
+}
+
+function watchEmailVerification(user) {
+  if (verificationInterval) clearInterval(verificationInterval);
+
+  window.location.hash = "verify-wait";
+
+  verificationInterval = setInterval(async () => {
+    try {
+      await user.reload();
+      if (user.emailVerified) {
+        clearInterval(verificationInterval);
+        alert("Email verified successfully! Welcome to the PROPHUNT Vault.");
+        window.location.hash = "catalog";
+      }
+    } catch (err) {
+      console.error("Error checking verification status:", err);
+    }
+  }, 3000);
+}
+
+// --- Create Auction with Canvas Image Compression ---
 function setupAuctionForm() {
   const form = document.getElementById("create-auction-form");
+  if (!form) return;
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -189,7 +296,10 @@ function setupAuctionForm() {
 async function loadAuctions() {
   const grid = document.getElementById("auction-grid");
   const recommendationsGrid = document.getElementById("recommendations-grid");
-  const filterVal = document.getElementById("franchise-filter").value;
+  const filterDropdown = document.getElementById("franchise-filter");
+  const filterVal = filterDropdown ? filterDropdown.value : "all";
+
+  if (!grid) return;
   grid.innerHTML = "<p>Loading vault items...</p>";
   if (recommendationsGrid) {
     recommendationsGrid.innerHTML = "<p>Loading recommendations...</p>";
@@ -315,6 +425,7 @@ async function loadAuctions() {
   }
 }
 
+// --- Category-Based Recommendations ---
 function renderRecommendations(auctionDocs, category) {
   const grid = document.getElementById("recommendations-grid");
   if (!grid) return;
@@ -477,6 +588,8 @@ async function handleCustomBid(auctionId, customAmount) {
 
 function openProductModal(auctionId, data, isUpcoming, isEnded, isSeller) {
   const modal = document.getElementById("product-modal");
+  if (!modal) return;
+
   document.getElementById("modal-item-img").src = data.imageUrl;
   document.getElementById("modal-item-title").textContent = data.title;
   document.getElementById("modal-item-category").textContent = `Franchise Category: ${data.category}`;
@@ -543,7 +656,7 @@ function createModalActionArea() {
   return actionDiv;
 }
 
-// --- Winner notification is scoped to the currently signed-in winning bidder ---
+// --- Winner Notification ---
 function checkWinnerStatus(user) {
   const generation = ++winnerWatchGeneration;
   if (stopWatchingWinner) {
@@ -562,9 +675,7 @@ function checkWinnerStatus(user) {
   if (buyBtn) buyBtn.onclick = null;
   checkoutItem = { title: "", price: 0 };
 
-  if (!user) {
-    return;
-  }
+  if (!user) return;
 
   let auctions = [];
   const refreshWinnerStatus = () => {
@@ -596,21 +707,23 @@ function checkWinnerStatus(user) {
     }
 
     if (winningAuction) {
-      banner.style.display = "block";
-      wonName.textContent = `${winningAuction.title} ($${winningAuction.currentBid})`;
+      if (banner) banner.style.display = "block";
+      if (wonName) wonName.textContent = `${winningAuction.title} ($${winningAuction.currentBid})`;
       checkoutItem = {
         title: winningAuction.title,
         price: winningAuction.currentBid
       };
-      buyBtn.onclick = () => {
-        if (auth.currentUser?.uid !== user.uid) return;
-        document.getElementById("checkout-item-title").textContent = checkoutItem.title;
-        document.getElementById("checkout-item-price").textContent = checkoutItem.price;
-        window.location.hash = "checkout";
-      };
+      if (buyBtn) {
+        buyBtn.onclick = () => {
+          if (auth.currentUser?.uid !== user.uid) return;
+          document.getElementById("checkout-item-title").textContent = checkoutItem.title;
+          document.getElementById("checkout-item-price").textContent = checkoutItem.price;
+          window.location.hash = "checkout";
+        };
+      }
     } else {
-      banner.style.display = "none";
-      wonName.textContent = "";
+      if (banner) banner.style.display = "none";
+      if (wonName) wonName.textContent = "";
       checkoutItem = { title: "", price: 0 };
     }
 
@@ -632,7 +745,7 @@ function checkWinnerStatus(user) {
     },
     (error) => {
       if (generation !== winnerWatchGeneration) return;
-      banner.style.display = "none";
+      if (banner) banner.style.display = "none";
       console.error("Error watching auction winners:", error);
     }
   );
@@ -640,6 +753,8 @@ function checkWinnerStatus(user) {
 
 function setupCheckout() {
   const form = document.getElementById("checkout-form");
+  if (!form) return;
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     alert("Order Confirmed! Prop stored in My Vault.");
@@ -650,5 +765,8 @@ function setupCheckout() {
 }
 
 function setupFilters() {
-  document.getElementById("franchise-filter").addEventListener("change", loadAuctions);
+  const filterDropdown = document.getElementById("franchise-filter");
+  if (filterDropdown) {
+    filterDropdown.addEventListener("change", loadAuctions);
+  }
 }
