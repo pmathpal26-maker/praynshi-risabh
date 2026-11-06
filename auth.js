@@ -1,5 +1,6 @@
 import { auth } from "./firebase-config.js";
 import { 
+  createUserWithEmailAndPassword,
   sendPasswordResetEmail, 
   signOut, 
   sendEmailVerification 
@@ -27,31 +28,12 @@ export async function sendVerificationLink(user) {
   }
 }
 
-// 3. Logout Logic
-export async function handleLogout() {
-  try {
-    await signOut(auth);
-    alert("Logged out successfully!");
-    window.location.hash = "#home";
-  } catch (error) {
-    console.error("Logout Error:", error);
-  }
-}
-import { auth } from "./firebase-config.js";
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  sendEmailVerification 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-// Register user and send verification email
+// 3. Register user and send verification email
 export async function registerWithEmail(email, password) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
-    // Send Firebase verification link to Gmail
     await sendEmailVerification(user);
     alert("Account created successfully! A verification link has been sent to your Gmail inbox. Please verify before logging in.");
     
@@ -60,5 +42,16 @@ export async function registerWithEmail(email, password) {
   } catch (error) {
     console.error("Registration Error:", error);
     alert(error.message);
+  }
+}
+
+// 4. Logout Logic
+export async function handleLogout() {
+  try {
+    await signOut(auth);
+    alert("Logged out successfully!");
+    window.location.hash = "#home";
+  } catch (error) {
+    console.error("Logout Error:", error);
   }
 }

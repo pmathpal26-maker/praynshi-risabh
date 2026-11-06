@@ -2,6 +2,8 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // --- Auctions Rules ---
     match /auctions/{auctionId} {
       allow read: if true;
 
@@ -9,6 +11,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasAll([
           'title',
           'category',
+          'description',
           'currentBid',
           'highestBidderId',
           'highestBidderEmail',
@@ -22,6 +25,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
           'title',
           'category',
+          'description',
           'currentBid',
           'highestBidderId',
           'highestBidderEmail',
@@ -38,6 +42,7 @@ service cloud.firestore {
         && request.resource.data.highestBidderEmail == ''
         && request.resource.data.title is string
         && request.resource.data.category in ['Sci-Fi', 'Fantasy', 'Action']
+        && request.resource.data.description is string
         && request.resource.data.currentBid is number
         && request.resource.data.currentBid > 0
         && request.resource.data.imageUrl is string
@@ -59,6 +64,38 @@ service cloud.firestore {
 
       allow delete: if request.auth != null
         && request.auth.uid == resource.data.sellerId;
+    }
+
+    // --- Bids Collection Rules (Vault History Ledger) ---
+    match /bids/{bidId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll([
+          'auctionId',
+          'title',
+          'category',
+          'imageUrl',
+          'bidAmount',
+          'userId',
+          'userEmail',
+          'timestamp'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'auctionId',
+          'title',
+          'category',
+          'imageUrl',
+          'bidAmount',
+          'userId',
+          'userEmail',
+          'timestamp'
+        ])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.userEmail == request.auth.token.email
+        && request.resource.data.bidAmount is number
+        && request.resource.data.bidAmount > 0
+        && request.resource.data.timestamp is number;
     }
   }
 }

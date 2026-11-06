@@ -413,6 +413,105 @@ button { font-family: inherit; cursor: pointer; }
 .catalog-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
 .catalog-head h2 { font-size: 1.5rem; }
 
+/* ===== DISTINCT CATALOG SECTIONS STYLING ===== */
+.catalog-section, .recommendations-section {
+  background: rgba(27, 19, 48, 0.45);
+  border: 1px solid var(--hair-soft);
+  border-radius: 20px;
+  padding: 1.5rem 1.8rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.catalog-section .section-title, 
+.recommendations-section .section-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 1.2rem 0;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--hair-soft);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+/* Upcoming Auctions Custom Tint (Cyan Glow) */
+#upcoming-grid .card {
+  border-color: rgba(34, 211, 238, 0.25);
+  background: linear-gradient(145deg, #131b31, #1b1330);
+}
+#upcoming-grid .card:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 28px rgba(34, 211, 238, 0.25);
+}
+
+/* Live Vault Auctions Custom Tint (Mint/Teal Live Glow) */
+#auction-grid .card {
+  border-color: rgba(34, 229, 200, 0.25);
+  background: linear-gradient(145deg, #102427, #1b1330);
+}
+#auction-grid .card:hover {
+  border-color: var(--live);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 28px rgba(34, 229, 200, 0.25);
+}
+
+/* Recommended For You Custom Tint (Purple/Gold Highlight) */
+#recommendations-grid .card {
+  border-color: rgba(168, 85, 247, 0.3);
+  background: linear-gradient(145deg, #231338, #1b1330);
+}
+#recommendations-grid .card:hover {
+  border-color: var(--gold);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 28px rgba(168, 85, 247, 0.3);
+}
+
+/* Previous / Ended Auctions Dimmed Archival Tone */
+#ended-grid .card {
+  opacity: 0.75;
+  border-color: rgba(255, 255, 255, 0.06);
+  background: linear-gradient(145deg, #141118, #191422);
+  filter: grayscale(20%);
+}
+#ended-grid .card:hover {
+  opacity: 1;
+  filter: none;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== MY VAULT SUB-SECTION STYLING ===== */
+#myvault .catalog-section {
+  background: rgba(27, 19, 48, 0.6);
+  border: 1px solid var(--hair-soft);
+  border-radius: 20px;
+  padding: 1.8rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+}
+
+/* Won Trophies Cards Styling (Mint / Emerald Highlight) */
+#myvault-grid .card {
+  border-color: rgba(61, 220, 151, 0.3);
+  background: linear-gradient(145deg, #132722, #1b1330);
+}
+#myvault-grid .card:hover {
+  border-color: var(--ok);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 28px rgba(61, 220, 151, 0.3);
+}
+
+/* Bidding Activity / Records Cards Styling (Magenta / Purple Highlight) */
+#mybids-grid .card {
+  border-color: rgba(255, 61, 119, 0.25);
+  background: linear-gradient(145deg, #2a1222, #1b1330);
+}
+#mybids-grid .card:hover {
+  border-color: var(--accent-magenta);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 28px rgba(255, 61, 119, 0.25);
+}
+
 /* ===== BUTTONS ===== */
 .cta-btn, .btn-gold {
   display: inline-flex; align-items: center; justify-content: center;
@@ -534,6 +633,7 @@ button { font-family: inherit; cursor: pointer; }
   .spot-art { display: none; }
   .top-cta { display: none; }
 }
+
 /* Circular container for genre icons */
 .chip-icon-box {
   width: 38px;

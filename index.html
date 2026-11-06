@@ -156,7 +156,7 @@
         <!-- Catalog View -->
         <section id="catalog" class="view container">
           <div class="catalog-head">
-            <h2 class="serif">Live Vault Auctions</h2>
+            <h2 class="serif">Vault Marketplace</h2>
             <div class="filter-bar">
               <select id="franchise-filter" class="type-select">
                 <option value="all">All Franchises / Categories</option>
@@ -166,10 +166,29 @@
               </select>
             </div>
           </div>
-          <div id="auction-grid" class="grid listing-grid"></div>
-          <section class="recommendations-section">
-            <h3 class="section-title">Recommended For You</h3>
+
+          <!-- Upcoming Auctions Section -->
+          <section class="catalog-section" style="margin-bottom: 2rem;">
+            <h3 class="section-title">⏱️ Upcoming Auctions</h3>
+            <div id="upcoming-grid" class="grid listing-grid"></div>
+          </section>
+
+          <!-- Live Vault Auctions Section -->
+          <section class="catalog-section" style="margin-bottom: 2rem;">
+            <h3 class="section-title">🔴 Live Vault Auctions</h3>
+            <div id="auction-grid" class="grid listing-grid"></div>
+          </section>
+
+          <!-- Recommendations Section -->
+          <section class="recommendations-section" style="margin-bottom: 2rem;">
+            <h3 class="section-title">✨ Recommended For You</h3>
             <div id="recommendations-grid" class="grid listing-grid"></div>
+          </section>
+
+          <!-- Ended / Previous Auctions Section -->
+          <section class="catalog-section" style="margin-bottom: 2rem;">
+            <h3 class="section-title">⌛ Previous Auctions (Ended)</h3>
+            <div id="ended-grid" class="grid listing-grid"></div>
           </section>
         </section>
 
@@ -177,9 +196,32 @@
         <section id="myvault" class="view container">
           <div class="catalog-head">
             <h2 class="serif">My Vault Collection</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Props and artifacts you have won or securely purchased.</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Manage your secured trophies, bidding ledger, and archive showcase.</p>
           </div>
-          <div id="myvault-grid" class="grid listing-grid" style="margin-top: 1.5rem;"></div>
+
+          <!-- 1. Won Trophies Section -->
+          <section class="catalog-section" style="margin-bottom: 2.5rem;">
+            <h3 class="section-title">🛡️ Won Vault Trophies</h3>
+            <div id="myvault-grid" class="grid listing-grid"></div>
+          </section>
+
+          <!-- 2. Bidding History / Activity Records Section -->
+          <section class="catalog-section" style="margin-bottom: 2.5rem;">
+            <h3 class="section-title">📜 Bidding Activity & Records</h3>
+            <div id="mybids-grid" class="grid listing-grid"></div>
+          </section>
+
+          <!-- 3. Extra Vault Spotlight / Showcase Section -->
+          <section class="recommendations-section" style="margin-bottom: 2rem; border-color: rgba(192, 132, 252, 0.4);">
+            <h3 class="section-title">💎 Curated Collector's Showcase</h3>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; background: rgba(168, 85, 247, 0.1); padding: 1.5rem; border-radius: 16px;">
+              <div>
+                <h4 class="serif" style="font-size: 1.1rem; color: #ffe066; margin-bottom: 0.3rem;">Elite Archival Status</h4>
+                <p style="font-size: 0.88rem; color: var(--text-muted);">Your collector rank is active. Enjoy priority escrow and automated live-vault notifications on high-value cinematic props.</p>
+              </div>
+              <a href="#catalog" class="cta-btn btn btn-gold" style="padding: 0.6rem 1.5rem; font-size: 0.85rem;">Browse Live Vault</a>
+            </div>
+          </section>
         </section>
 
         <!-- Sell View -->
@@ -197,6 +239,9 @@
                   <option value="Fantasy">Fantasy</option>
                   <option value="Action">Action</option>
                 </select>
+              </div>
+              <div class="form-field">
+                <textarea id="prop-description" placeholder="Item Description / Provenance & Details" rows="3" required style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.75rem; color: inherit; font-family: inherit; resize: vertical;"></textarea>
               </div>
               <div class="form-field">
                 <input type="number" id="prop-price" placeholder="Starting Price ($)" required>
@@ -222,14 +267,23 @@
         <section id="account" class="view container">
           <div class="form-container" id="auth-container">
             <h2 id="auth-heading" class="serif" style="margin-bottom: 1rem;">Sign In</h2>
-            <form id="login-form">
+            <form id="login-form" novalidate>
               <div class="form-field">
-                <input type="email" id="auth-email" placeholder="Email" required>
+                <input type="email" id="auth-email" placeholder="Email" required aria-describedby="auth-email-error">
+                <small id="auth-email-error" role="alert" style="color: var(--accent-magenta, #ff3d77); font-size: 0.75rem; display: none; margin-top: 6px; font-weight: 500;"></small>
               </div>
-              <div class="form-field">
+              <p id="registration-help" hidden>We’ll send a sign-in link to verify your email. You’ll choose a password after opening the link.</p>
+              <div class="form-field" id="auth-password-field">
                 <input type="password" id="auth-password" placeholder="Password" required>
               </div>
               <button type="submit" class="cta-btn btn btn-gold" id="auth-submit-btn" style="width: 100%;">Login</button>
+            </form>
+            <form id="set-password-form" hidden>
+              <div class="form-field">
+                <input type="password" id="set-password" placeholder="Create a password" autocomplete="new-password" minlength="6" required>
+                <small id="set-password-error" role="alert" style="color: var(--accent-magenta, #ff3d77); font-size: 0.75rem; display: none; margin-top: 6px; font-weight: 500;"></small>
+              </div>
+              <button type="submit" class="cta-btn btn btn-gold" style="width: 100%;">Set Password</button>
             </form>
             <p class="auth-toggle" id="toggle-auth-mode">Don't have an account? Register</p>
           </div>
@@ -239,10 +293,12 @@
         <section id="verify-wait" class="view container">
           <div class="form-container" style="text-align: center;">
             <h2 class="serif" style="margin-bottom: 1rem; color: var(--accent-gold, #ffe066);">📧 Verification Required</h2>
-            <p style="color: var(--text-muted, #8a8a9e); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">
+            <p style="color: var(--text-muted, #8a8a9e); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem;">
               A verification link has been sent to your Gmail inbox. Please check your phone or email, click the link, and this screen will automatically refresh into the dashboard.
             </p>
-            <div style="font-size: 2rem; margin-bottom: 1.5rem;">⏳</div>
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⏳</div>
+            <p id="verification-timer" style="color: var(--accent-cyan, #22d3ee); font-size: 0.9rem; font-weight: 600; margin-bottom: 1.5rem;">Time remaining: 1:00</p>
+            
             <button id="btn-resend-verification" class="cta-btn btn btn-gold" style="width: 100%; margin-bottom: 0.75rem;">Resend Email</button>
             <button id="btn-cancel-verify" class="cta-btn btn" style="width: 100%; background: transparent; color: #ff3d77; border: 1px solid #ff3d77;">Cancel / Back to Sign In</button>
           </div>
@@ -279,7 +335,6 @@
       </div>
       <div class="modal-foot">
         <span class="modal-price">$<span id="modal-item-price"></span></span>
-        <button id="modal-bid-btn" class="cta-btn btn btn-gold">Place Bid (+$10)</button>
       </div>
     </div>
   </div>
