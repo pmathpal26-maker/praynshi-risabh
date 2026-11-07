@@ -339,6 +339,40 @@
     </div>
   </div>
 
+  <!-- ============ CUSTOM AI ASSISTANT WIDGET (SELECTION BUTTONS UI) ============ -->
+  <button id="ai-chat-launcher" class="ai-chat-launcher" aria-label="Open PROPHUNT AI Assistant">
+    💬 <span class="launcher-text">Prop AI</span>
+  </button>
+
+  <div id="ai-chat-drawer" class="ai-chat-drawer">
+    <div class="ai-chat-header">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <span style="font-size: 1.2rem;">🤖</span>
+        <div>
+          <h4 class="serif" style="font-size: 0.95rem; margin: 0; color: #fff;">PropHunt Assistant</h4>
+          <small style="color: var(--accent-cyan); font-size: 0.75rem;">Online · Guided Assistant</small>
+        </div>
+      </div>
+      <button id="ai-chat-close" class="ai-chat-close-btn">&times;</button>
+    </div>
+
+    <div id="ai-chat-body" class="ai-chat-body">
+      <div class="chat-bubble bot-bubble">
+        Hello! I'm your PROPHUNT AI guide. Select a topic below to get instant answers or assistance:
+      </div>
+    </div>
+
+    <div id="ai-chat-footer" class="ai-chat-footer" style="display: flex; flex-direction: column; gap: 6px; padding: 12px; background: rgba(14, 8, 28, 0.85); border-top: 1px solid var(--hair-soft);">
+      <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Select a Query:</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        <button type="button" class="ai-query-btn" data-query="How do I place a bid?">How to bid?</button>
+        <button type="button" class="ai-query-btn" data-query="Where are my won items and bids?">My Vault / Won items</button>
+        <button type="button" class="ai-query-btn" data-query="How do I list a prop for auction?">How to list a prop?</button>
+        <button type="button" class="ai-query-btn" data-query="What is the Gmail verification policy?">Gmail verification</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="script.js"></script>
   <script src="ui.js"></script>
 </body>

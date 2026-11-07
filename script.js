@@ -65,6 +65,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupAuctionForm();
   setupFilters();
   setupCheckout();
+  setupAIChatbot(); // Initialize custom AI Assistant widget
 });
 
 // --- Auth Handling with Inline Interface Gmail Validation ---
@@ -776,11 +777,10 @@ async function loadMyVault() {
       wonGrid.innerHTML = "<p>Your vault trophies are empty. Win an auction to store props here!</p>";
     }
 
-    // 2. Fetch All Bidding Activity Records (Even if not won)
+    // 2. Fetch All Bidding Activity Records (Sorted via JS to avoid composite index errors)
     const bidsQuery = query(
       collection(db, "bids"),
-      where("userId", "==", auth.currentUser.uid),
-      orderBy("timestamp", "desc")
+      where("userId", "==", auth.currentUser.uid)
     );
     const bidsSnapshot = await getDocs(bidsQuery);
     bidsGrid.innerHTML = "";
@@ -788,8 +788,11 @@ async function loadMyVault() {
     if (bidsSnapshot.empty) {
       bidsGrid.innerHTML = "<p>You haven't placed any bids yet.</p>";
     } else {
-      bidsSnapshot.forEach((docSnap) => {
-        const bidData = docSnap.data();
+      const bidDocs = bidsSnapshot.docs
+        .map(doc => doc.data())
+        .sort((a, b) => b.timestamp - a.timestamp);
+
+      bidDocs.forEach((bidData) => {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
@@ -1064,5 +1067,80 @@ function setupFilters() {
   const filterDropdown = document.getElementById("franchise-filter");
   if (filterDropdown) {
     filterDropdown.addEventListener("change", loadAuctions);
+  }
+}
+
+// --- Custom AI Assistant Widget Logic (Button Selection Mode) ---
+function setupAIChatbot() {
+  const launcher = document.getElementById("ai-chat-launcher");
+  const drawer = document.getElementById("ai-chat-drawer");
+  const closeBtn = document.getElementById("ai-chat-close");
+  const chatBody = document.getElementById("ai-chat-body");
+  const queryButtons = document.querySelectorAll(".ai-query-btn");
+
+  if (!launcher || !drawer || !chatBody) return;
+
+  // Toggle drawer visibility
+  launcher.addEventListener("click", () => {
+    drawer.classList.toggle("open");
+  });
+
+  closeBtn.addEventListener("click", () => {
+    drawer.classList.remove("open");
+  });
+
+  // Append chat bubbles to body
+  function appendBubble(text, sender = "bot") {
+    const bubble = document.createElement("div");
+    bubble.className = `chat-bubble ${sender === "user" ? "user-bubble" : "bot-bubble"}`;
+    bubble.textContent = text;
+    chatBody.appendChild(bubble);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  // Handle Query Button Clicks
+  queryButtons.forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const selectedQuery = btn.dataset.query || btn.textContent.trim();
+
+      // Render selected prompt as user bubble
+      appendBubble(selectedQuery, "user");
+
+      // Show temporary typing indicator
+      const typingElem = document.createElement("div");
+      typingElem.className = "chat-bubble bot-bubble";
+      typingElem.textContent = "Thinking...";
+      chatBody.appendChild(typingElem);
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      // Simulate network / processing delay
+      setTimeout(async () => {
+        try {
+          const botResponse = await fetchAIResponse(selectedQuery);
+          if (typingElem.parentNode) chatBody.removeChild(typingElem);
+          appendBubble(botResponse, "bot");
+        } catch (err) {
+          if (typingElem.parentNode) chatBody.removeChild(typingElem);
+          appendBubble("Sorry, I encountered an issue processing that query.", "bot");
+        }
+      }, 400);
+    });
+  });
+}
+
+// Rule engine matching query selections
+async function fetchAIResponse(query) {
+  const q = query.toLowerCase();
+
+  if (q.includes("bid") || q.includes("how to bid")) {
+    return "To place a bid: navigate to the Catalog view, select any active Live Vault Auction, enter a custom bid amount exceeding the current price, and click 'Place Bid'.";
+  } else if (q.includes("vault") || q.includes("won") || q.includes("bids")) {
+    return "Your won auctions are archived under '🛡️ Won Vault Trophies' in My Vault. All submitted bids across any auction are recorded in your '📜 Bidding Activity & Records' ledger.";
+  } else if (q.includes("list") || q.includes("sell") || q.includes("prop")) {
+    return "Click '+ List a Prop' in the header or navigate to the 'Sell a Prop' tab. Fill in your item details, upload a photo (auto-compressed to max 600px), set start/end timestamps, and publish!";
+  } else if (q.includes("gmail") || q.includes("verification") || q.includes("account")) {
+    return "PROPHUNT requires a valid @gmail.com address to sign up. Once registered, click the link sent to your Gmail within 60 seconds to verify your account.";
+  } else {
+    return "Select one of the query options below to learn more about PROPHUNT auction features!";
   }
 }
